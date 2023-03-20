@@ -1,7 +1,7 @@
 module ADAuction::auction {
     use std::signer;
     use std::error;
-    use std::string::String;
+    use std::string::{ Self, String };
     use aptos_framework::coin::{ Self, Coin };
     use aptos_framework::aptos_coin::AptosCoin;
     use aptos_framework::account::{ Self, SignerCapability };
@@ -26,8 +26,6 @@ module ADAuction::auction {
 
     fun init_module(
         sender: &signer,
-        base_text: String,
-        base_image: String
     ) {
         let (auction_signer, signer_cap): (signer, SignerCapability) = account::create_resource_account(sender, SEED);
         
@@ -35,8 +33,8 @@ module ADAuction::auction {
 
         move_to<Auction>(&auction_signer, Auction {
             ad: AD {
-                text: base_text,
-                image: base_image
+                text: string::utf8(b"Mo and Avery"),
+                image: string::utf8(b"https://aptoslabs.com/assets/mo_avery-f23a232e636445792512da230647dcdf90ab4469.webp")
             },
             last_bet: 0
         });
