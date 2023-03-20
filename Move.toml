@@ -1,12 +1,12 @@
 [package]
-name = 'ADAuction'
+name = 'AdAuction'
 version = '1.0.0'
 
 [addresses]
-ADAuction = '_'
+AdAuction = '_'
 
 [dev-addresses]
-ADAuction = '0x2'
+AdAuction = '0x2'
 
 [dependencies.AptosFramework]
 git = 'https://github.com/aptos-labs/aptos-core.git'

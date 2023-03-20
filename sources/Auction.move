@@ -1,4 +1,4 @@
-module ADAuction::auction {
+module AdAuction::auction {
     use std::signer;
     use std::error;
     use std::string::{ Self, String };
@@ -10,13 +10,13 @@ module ADAuction::auction {
 
     const EBET_SMALLER_THAN_PREVIOUS_BET: u64 = 0;
 
-    struct AD has store {
+    struct Ad has store {
         text: String,
         image: String,
     }
 
     struct Auction has key {
-        ad: AD,
+        ad: Ad,
         last_bet: u64
     }
 
@@ -32,7 +32,7 @@ module ADAuction::auction {
         coin::register<AptosCoin>(&auction_signer);
 
         move_to<Auction>(&auction_signer, Auction {
-            ad: AD {
+            ad: Ad {
                 text: string::utf8(b"Mo and Avery"),
                 image: string::utf8(b"https://aptoslabs.com/assets/mo_avery-f23a232e636445792512da230647dcdf90ab4469.webp")
             },
@@ -50,7 +50,7 @@ module ADAuction::auction {
         text: String,
         image: String
     ) acquires AuctionInfo, Auction {
-        let auction_info = borrow_global<AuctionInfo>(@ADAuction);
+        let auction_info: &AuctionInfo = borrow_global<AuctionInfo>(@AdAuction);
         let auction_signer: signer = account::create_signer_with_capability(&auction_info.signer_cap);
         let auction_addr: address = signer::address_of(&auction_signer);
         let auction: &mut Auction = borrow_global_mut<Auction>(auction_addr);
@@ -58,10 +58,23 @@ module ADAuction::auction {
         assert!(amount > auction.last_bet, error::permission_denied(EBET_SMALLER_THAN_PREVIOUS_BET));
         let coin: Coin<AptosCoin> = coin::withdraw<AptosCoin>(account, amount);
         let account_addr: address = signer::address_of(account);
-        let ad: &mut AD = &mut auction.ad;
+        let ad: &mut Ad = &mut auction.ad;
 
         bet_internal(account_addr, coin);
         change_ad(text, image, ad);
+    }
+
+    public fun ad(): (
+        String,
+        String
+    ) acquires AuctionInfo, Auction {
+        let auction_info: &AuctionInfo = borrow_global<AuctionInfo>(@AdAuction);
+        let auction_signer: signer = account::create_signer_with_capability(&auction_info.signer_cap);
+        let auction_addr: address = signer::address_of(&auction_signer);
+        let auction: &Auction = borrow_global<Auction>(auction_addr);
+        let ad: &Ad = &auction.ad;
+
+        (ad.text, ad.image)
     }
 
     fun bet_internal(
@@ -74,7 +87,7 @@ module ADAuction::auction {
     fun change_ad(
         text: String,
         image: String,
-        ad: &mut AD
+        ad: &mut Ad
     ) {
         ad.text = text;
         ad.image = image;
