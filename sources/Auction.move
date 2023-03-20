@@ -77,6 +77,15 @@ module AdAuction::auction {
         (ad.text, ad.image)
     }
 
+    public fun last_bet(): u64 acquires AuctionInfo, Auction {
+        let auction_info: &AuctionInfo = borrow_global<AuctionInfo>(@AdAuction);
+        let auction_signer: signer = account::create_signer_with_capability(&auction_info.signer_cap);
+        let auction_addr: address = signer::address_of(&auction_signer);
+        let auction: &Auction = borrow_global<Auction>(auction_addr);
+
+        auction.last_bet
+    }
+
     fun bet_internal(
         account_addr: address,
         coin: Coin<AptosCoin>
